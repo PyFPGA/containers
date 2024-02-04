@@ -1,33 +1,15 @@
-FROM debian:stable-slim
-
-###############################################################################
-# GHDL
-###############################################################################
-
-WORKDIR /root
+FROM ubuntu:latest
 
 RUN apt update -qq \
  && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+    ### GHDL
     build-essential \
     ca-certificates \
     git \
     gnat \
     libgnat-12 \
     zlib1g-dev \
- && update-ca-certificates \
- && git clone --depth 1 https://github.com/ghdl/ghdl \
- && mkdir ghdl/build && cd ghdl/build \
- && ../configure --prefix=/usr/local \
- && make && make install
-
-###############################################################################
-# Yosys
-###############################################################################
-
-WORKDIR /root
-
-RUN apt update -qq \
- && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+    ### Yosys
     build-essential \
     ca-certificates \
     clang \
@@ -46,8 +28,31 @@ RUN apt update -qq \
     libboost-python-dev \
     libboost-filesystem-dev \
     zlib1g-dev \
- && update-ca-certificates \
- && git clone --depth 1 https://github.com/YosysHQ/yosys \
+    ### synlig
+    curl \
+    jq \
+    tar \
+    wget \
+ && update-ca-certificates
+
+###############################################################################
+# GHDL
+###############################################################################
+
+WORKDIR /root
+
+RUN git clone --depth 1 https://github.com/ghdl/ghdl \
+ && mkdir ghdl/build && cd ghdl/build \
+ && ../configure --prefix=/usr/local \
+ && make && make install
+
+###############################################################################
+# Yosys
+###############################################################################
+
+WORKDIR /root
+
+RUN git clone --depth 1 https://github.com/YosysHQ/yosys \
  && cd yosys \
  && make && make install
 
@@ -67,16 +72,9 @@ RUN git clone --depth 1 https://github.com/ghdl/ghdl-yosys-plugin.git \
 
 WORKDIR /root
 
-RUN apt update -qq \
- && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
-    curl \
-    jq \
-    tar \
-    wget \
- && mkdir synlig && cd synlig \
+RUN mkdir synlig && cd synlig \
  && curl https://api.github.com/repos/chipsalliance/synlig/releases/latest | jq .assets[1] | grep "browser_download_url" | grep -Eo 'https://[^\"]*' | xargs wget -O - | tar -xz \
  && ./install_plugin.sh
-
 
 ###############################################################################
 # Clean
@@ -84,7 +82,4 @@ RUN apt update -qq \
 
 RUN apt-get clean \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apt/archives/*.deb \
- && rm -fr /root/ghdl \
- && rm -fr /root/yosys \
- && rm -fr /root/ghdl-yosys-plugin \
- && rm -fr /root/synlig
+ && rm -fr /root/ghdl /root/yosys /root/ghdl-yosys-plugin /root/synlig
