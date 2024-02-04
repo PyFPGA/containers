@@ -1,6 +1,6 @@
 # PyFPGA containers
 
-> **WARNING:** this is a WIP project in an early stage (Sep, 2023).
+> **WARNING:** this is a WIP project in an early stage (Feb, 2024).
 
 * `synthesis`:
   * [GHDL](https://github.com/ghdl/ghdl)
