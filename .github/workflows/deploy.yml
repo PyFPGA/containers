@@ -1,0 +1,19 @@
+name: Deploy Docker Images
+
+on: [push]
+
+jobs:
+  synthesis:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build Docker image
+      run: docker build -f recipes/synthesis -t ghcr.io/pyfpga/synthesis .
+    - name: Push Docker image
+      run: docker push ghcr.io/pyfpga/synthesis
