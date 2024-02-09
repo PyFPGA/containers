@@ -66,7 +66,8 @@ WORKDIR /root
 RUN git clone --depth 1 https://github.com/ghdl/ghdl \
  && mkdir ghdl/build && cd ghdl/build \
  && ../configure --prefix=/usr/local \
- && make && make install
+ && make && make install \
+ && cd /root && rm -fr ghdl
 
 ###############################################################################
 # Yosys
@@ -76,7 +77,8 @@ WORKDIR /root
 
 RUN git clone --depth 1 https://github.com/YosysHQ/yosys \
  && cd yosys \
- && make && make install
+ && make && make install \
+ && cd /root && rm -fr yosys
 
 ###############################################################################
 # ghdl-yosys-plugin
@@ -86,7 +88,8 @@ WORKDIR /root
 
 RUN git clone --depth 1 https://github.com/ghdl/ghdl-yosys-plugin.git \
  && cd ghdl-yosys-plugin \
- && make && make install
+ && make && make install \
+ && cd /root && rm -fr ghdl-yosys-plugin
 
 ###############################################################################
 # synlig
@@ -99,14 +102,6 @@ RUN git clone --depth 1 https://github.com/chipsalliance/synlig \
  && git submodule sync \
  && git submodule update --init --recursive third_party/surelog \
  && git submodule update --init --recursive third_party/yosys \
- && make install
-
-RUN cp /root/synlig/out/current/share/yosys/plugins/systemverilog.so /usr/local/share/yosys/plugins
-
-###############################################################################
-# Clean
-###############################################################################
-
-WORKDIR /root
-
-RUN rm -fr ghdl yosys ghdl-yosys-plugin synlig
+ && make install \
+ && cp /root/synlig/out/current/share/yosys/plugins/systemverilog.so /usr/local/share/yosys/plugins \
+ && cd /root && rm -fr synlig
