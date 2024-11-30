@@ -30,8 +30,7 @@ RUN apt update -qq \
 RUN git clone --depth 1 https://github.com/ghdl/ghdl \
  && mkdir ghdl/build && cd ghdl/build \
  && ../configure --prefix=/usr/local \
- && make -j$(nproc) && make install \
- && cd /root && rm -fr ghdl
+ && make -j$(nproc) && make install
 
 #
 # Yosys
@@ -39,8 +38,7 @@ RUN git clone --depth 1 https://github.com/ghdl/ghdl \
 
 RUN git clone --depth 1 https://github.com/YosysHQ/yosys \
  && cd yosys && git submodule update --init \
- && make -j$(nproc) && make install \
- && cd /root && rm -fr yosys
+ && make -j$(nproc) && make install
 
 #
 # ghdl-yosys-plugin
@@ -48,5 +46,28 @@ RUN git clone --depth 1 https://github.com/YosysHQ/yosys \
 
 RUN git clone --depth 1 https://github.com/ghdl/ghdl-yosys-plugin.git \
  && cd ghdl-yosys-plugin && git submodule update --init \
- && make -j$(nproc) && make install \
- && cd /root && rm -fr ghdl-yosys-plugin
+ && make -j$(nproc) && make install
+
+#
+# Clean-up
+#
+
+RUN cd /usr/local/lib && rm -fr libghdlvpi.so libghw.so python3.* \
+ && cd /usr/local/bin && rm ghwdump yosys-filterlib yosys-smtbmc yosys-witness
+
+###############################################################################
+
+FROM ubuntu:latest
+#gcr.io/distroless/static-debian12
+
+RUN apt update -qq \
+ && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+    libreadline-dev \
+    tcl-dev \
+ && apt autoclean && apt clean && apt -y autoremove \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY --from=build /usr/local/bin          /usr/local/bin
+COPY --from=build /usr/local/lib          /usr/local/lib
+COPY --from=build /usr/local/include/ghdl /usr/local/include/ghdl
+COPY --from=build /usr/local/share/yosys  /usr/local/share/yosys
