@@ -20,6 +20,10 @@ RUN apt update -qq \
     libffi-dev \
     pkg-config \
     python3 \
+    # Synlig
+    cmake \
+    default-jre \
+    python3-orderedmultidict \
  && apt autoclean && apt clean && apt -y autoremove \
  && rm -rf /var/lib/apt/lists/*
 
@@ -49,6 +53,15 @@ RUN git clone --depth 1 https://github.com/ghdl/ghdl-yosys-plugin.git \
  && make -j$(nproc) && make install
 
 #
+# Synlig
+#
+
+RUN git clone --depth 1 https://github.com/chipsalliance/synlig.git && cd synlig \
+ && git submodule update --init --depth 1 --recursive third_party/surelog \
+ && git submodule update --init --depth 1 --recursive third_party/yosys \
+ && make install -j$(nproc)
+
+#
 # Clean-up
 #
 
@@ -71,3 +84,4 @@ COPY --from=build /usr/local/bin          /usr/local/bin
 COPY --from=build /usr/local/lib          /usr/local/lib
 COPY --from=build /usr/local/include/ghdl /usr/local/include/ghdl
 COPY --from=build /usr/local/share/yosys  /usr/local/share/yosys
+COPY --from=build /usr/local/share/synlig /usr/local/share/synlig
