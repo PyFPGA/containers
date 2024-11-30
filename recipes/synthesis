@@ -1,107 +1,52 @@
-FROM ubuntu:latest
+FROM ubuntu:latest AS build
+
+WORKDIR /root
 
 RUN apt update -qq \
  && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
-    ### GHDL
+    # Common
     build-essential \
     ca-certificates \
     git \
-    gnat \
-    libgnat-12 \
     zlib1g-dev \
-    ### Yosys
-    build-essential \
-    ca-certificates \
+    # GHDL
+    gnat \
+    # Yosys
     clang \
     bison \
     flex \
     libreadline-dev \
-    gawk \
     tcl-dev \
     libffi-dev \
-    git \
-    graphviz \
-    xdot \
     pkg-config \
     python3 \
-    libboost-system-dev \
-    libboost-python-dev \
-    libboost-filesystem-dev \
-    zlib1g-dev \
-    ### synlig
-    ant \
-    bison \
-    build-essential \
-    cmake \
-    default-jre \
-    flex \
-    g++-11 \
-    gcc-11 \
-    git \
-    google-perftools \
-    libfl-dev \
-    libgoogle-perftools-dev \
-    libffi-dev \
-    libreadline-dev \
-    pkg-config \
-    python3 \
-    python3-dev \
-    python3-orderedmultidict \
-    python3-pip \
-    swig \
-    tcl-dev \
-    tclsh \
-    uuid \
-    uuid-dev \
-    wget \
- && apt clean && rm -rf /var/lib/apt/lists/* \
- && update-ca-certificates
+ && apt autoclean && apt clean && apt -y autoremove \
+ && rm -rf /var/lib/apt/lists/*
 
-###############################################################################
+#
 # GHDL
-###############################################################################
-
-WORKDIR /root
+#
 
 RUN git clone --depth 1 https://github.com/ghdl/ghdl \
  && mkdir ghdl/build && cd ghdl/build \
  && ../configure --prefix=/usr/local \
- && make && make install \
+ && make -j$(nproc) && make install \
  && cd /root && rm -fr ghdl
 
-###############################################################################
+#
 # Yosys
-###############################################################################
-
-WORKDIR /root
+#
 
 RUN git clone --depth 1 https://github.com/YosysHQ/yosys \
- && cd yosys \
- && make && make install \
+ && cd yosys && git submodule update --init \
+ && make -j$(nproc) && make install \
  && cd /root && rm -fr yosys
 
-###############################################################################
+#
 # ghdl-yosys-plugin
-###############################################################################
-
-WORKDIR /root
+#
 
 RUN git clone --depth 1 https://github.com/ghdl/ghdl-yosys-plugin.git \
- && cd ghdl-yosys-plugin \
- && make && make install \
+ && cd ghdl-yosys-plugin && git submodule update --init \
+ && make -j$(nproc) && make install \
  && cd /root && rm -fr ghdl-yosys-plugin
-
-###############################################################################
-# synlig
-###############################################################################
-
-WORKDIR /root
-
-RUN git clone --depth 1 https://github.com/chipsalliance/synlig \
- && cd synlig \
- && git submodule sync \
- && git submodule update --init --recursive third_party/surelog \
- && git submodule update --init --recursive third_party/yosys \
- && make install \
- && cp /root/synlig/out/current/share/yosys/plugins/systemverilog.so /usr/local/share/yosys/plugins \
- && cd /root && rm -fr synlig
