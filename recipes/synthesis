@@ -75,6 +75,7 @@ FROM ubuntu:latest
 
 RUN apt update -qq \
  && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+    gnat \
     libreadline-dev \
     tcl-dev \
  && apt autoclean && apt clean && apt -y autoremove \
