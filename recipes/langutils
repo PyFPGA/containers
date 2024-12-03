@@ -1,0 +1,52 @@
+FROM ubuntu:latest AS build
+
+WORKDIR /root
+
+RUN apt update -qq \
+ && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+    # Common
+    build-essential \
+    ca-certificates \
+    git \
+    python3 \
+    zlib1g-dev \
+    # Surelog
+    cmake \
+    default-jre \
+    python3-orderedmultidict \
+ && apt autoclean && apt clean && apt -y autoremove \
+ && rm -rf /var/lib/apt/lists/*
+
+#
+# Surelog
+#
+
+RUN git clone --depth 1 https://github.com/alainmarcel/Surelog.git \
+ && cd Surelog && git submodule update --init --recursive \
+ && make -j$(nproc) && make install
+
+###############################################################################
+
+## Surelog
+#/usr/local/lib/libcapnp.a
+#/usr/local/lib/libkj.a
+#/usr/local/lib/libuhdm.a
+#/usr/local/bin/uhdm-cmp
+#/usr/local/bin/uhdm-dump
+#/usr/local/bin/uhdm-hier
+#/usr/local/bin/uhdm-lint
+#/usr/local/include/uhdm
+#/usr/local/share/uhdm/UHDM.capnp
+#/usr/local/lib/cmake/UHDM
+#/usr/local/lib/pkgconfig/UHDM.pc
+#/usr/local/bin/surelog
+#/usr/local/bin/roundtrip
+#/usr/local/lib/libsurelog.a
+#/usr/local/lib/libantlr4-runtime.a
+#/usr/local/lib/libcapnp.a
+#/usr/local/lib/libkj.a
+#/usr/local/lib/libuhdm.a
+#/usr/local/share/surelog
+#/usr/local/include/Surelog
+#/usr/local/lib/cmake/Surelog
+#/usr/local/lib/pkgconfig/Surelog.pc
