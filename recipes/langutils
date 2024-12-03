@@ -10,12 +10,24 @@ RUN apt update -qq \
     git \
     python3 \
     zlib1g-dev \
+    # vhd2vl
+    flex \
+    bison \
+    iverilog \
     # Surelog
     cmake \
     default-jre \
     python3-orderedmultidict \
  && apt autoclean && apt clean && apt -y autoremove \
  && rm -rf /var/lib/apt/lists/*
+
+#
+# vhd2vl
+#
+
+RUN git clone --depth 1 https://github.com/ldoolitt/vhd2vl \
+ && cd vhd2vl && make -j$(nproc) \
+ && cp src/vhd2vl /usr/local/bin
 
 #
 # Surelog
