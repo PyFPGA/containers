@@ -30,6 +30,14 @@ RUN git clone --depth 1 https://github.com/ldoolitt/vhd2vl \
  && cp src/vhd2vl /usr/local/bin
 
 #
+# Slang
+#
+
+RUN git clone --depth 1 https://github.com/MikePopoloski/slang.git \
+ && cd slang && cmake -B build && cmake --build build -j8 \
+ && cmake --install build --strip
+
+#
 # Surelog
 #
 
@@ -38,6 +46,26 @@ RUN git clone --depth 1 https://github.com/alainmarcel/Surelog.git \
  && make -j$(nproc) && make install
 
 ###############################################################################
+
+## slang
+#/usr/local/lib/libfmt.a
+#/usr/local/include/fmt
+#/usr/local/lib/cmake/fmt
+#/usr/local/include/ieee1800
+#/usr/local/lib/libfmt.a
+#/usr/local/lib/libmimalloc.a
+#/usr/local/include/mimalloc-2.1
+#/usr/local/include/slang
+#/usr/local/include/slang
+#/usr/local/bin/slang
+#/usr/local/bin/slang-netlist
+#/usr/local/bin/slang-tidy
+#/usr/local/bin/slang-reflect
+#/usr/local/bin/slang-hier
+#/usr/local/lib/libsvlang.a
+#/usr/local/bin/slang
+#/usr/local/lib/cmake/slang
+#/usr/local/share/pkgconfig/sv-lang.pc
 
 ## Surelog
 #/usr/local/lib/libcapnp.a
