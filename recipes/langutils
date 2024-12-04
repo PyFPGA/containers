@@ -9,6 +9,7 @@ RUN apt update -qq \
     ca-certificates \
     git \
     python3 \
+    wget \
     zlib1g-dev \
     # vhd2vl
     flex \
@@ -18,6 +19,8 @@ RUN apt update -qq \
     cmake \
     default-jre \
     python3-orderedmultidict \
+    # Verible
+    bazel \
  && apt autoclean && apt clean && apt -y autoremove \
  && rm -rf /var/lib/apt/lists/*
 
@@ -44,6 +47,21 @@ RUN git clone --depth 1 https://github.com/MikePopoloski/slang.git \
 RUN git clone --depth 1 https://github.com/alainmarcel/Surelog.git \
  && cd Surelog && git submodule update --init --recursive \
  && make -j$(nproc) && make install
+
+#
+# sv2v
+#
+
+RUN wget -qO- https://get.haskellstack.org/ | sh \
+ && git clone --depth 1 https://github.com/zachjs/sv2v.git \
+ && cd sv2v && make -j$(nproc) \
+ && cp bin/sv2v /usr/local/bin
+
+#
+# Verible
+#
+
+
 
 ###############################################################################
 
