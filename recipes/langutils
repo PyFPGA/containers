@@ -2,12 +2,18 @@ FROM ubuntu:latest AS build
 
 WORKDIR /root
 
+#
+# Dependencies
+#
+
 RUN apt update -qq \
  && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
     # Common
     build-essential \
     ca-certificates \
+    curl \
     git \
+    gnupg \
     python3 \
     wget \
     zlib1g-dev \
@@ -19,7 +25,12 @@ RUN apt update -qq \
     cmake \
     default-jre \
     python3-orderedmultidict \
-    # Verible
+ && curl -sSL https://get.haskellstack.org/ | sh \
+ && curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor -o /usr/share/keyrings/bazel-archive-keyring.gpg \
+ && echo "deb [signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] \
+    https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list \
+ && apt update -qq \
+ && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
     bazel \
  && apt autoclean && apt clean && apt -y autoremove \
  && rm -rf /var/lib/apt/lists/*
@@ -52,16 +63,16 @@ RUN git clone --depth 1 https://github.com/alainmarcel/Surelog.git \
 # sv2v
 #
 
-RUN wget -qO- https://get.haskellstack.org/ | sh \
- && git clone --depth 1 https://github.com/zachjs/sv2v.git \
- && cd sv2v && make -j$(nproc) \
- && cp bin/sv2v /usr/local/bin
+RUN git clone --depth 1 https://github.com/zachjs/sv2v.git \
+ && cd sv2v && make -j$(nproc) && cp bin/sv2v /usr/local/bin
 
 #
 # Verible
 #
 
-
+RUN git clone --depth 1 https://github.com/chipsalliance/verible.git \
+ && cd verible && bazel build -c opt //... \
+ && bazel run -c opt :install -- /usr/local/bin
 
 ###############################################################################
 
@@ -108,3 +119,19 @@ RUN wget -qO- https://get.haskellstack.org/ | sh \
 #/usr/local/include/Surelog
 #/usr/local/lib/cmake/Surelog
 #/usr/local/lib/pkgconfig/Surelog.pc
+
+## Verible
+#/usr/local/bin/git-verible-verilog-format.sh
+#/usr/local/bin/verible-patch-tool
+#/usr/local/bin/verible-transform-interactive.sh
+#/usr/local/bin/verible-verilog-diff
+#/usr/local/bin/verible-verilog-format
+#/usr/local/bin/verible-verilog-format-changed-lines-interactive.sh
+#/usr/local/bin/verible-verilog-kythe-extractor
+#/usr/local/bin/verible-verilog-kythe-kzip-writer
+#/usr/local/bin/verible-verilog-lint
+#/usr/local/bin/verible-verilog-ls
+#/usr/local/bin/verible-verilog-obfuscate
+#/usr/local/bin/verible-verilog-preprocessor
+#/usr/local/bin/verible-verilog-project
+#/usr/local/bin/verible-verilog-syntax
