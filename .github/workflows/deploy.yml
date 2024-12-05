@@ -3,8 +3,13 @@ name: Deploy Docker Images
 on: [push]
 
 jobs:
-  synthesis:
+  deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        name:
+          - synthesis
+          - langutils
     steps:
     - uses: actions/checkout@v2
     - name: Login to GitHub Container Registry
@@ -13,7 +18,7 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    - name: Build Docker image
-      run: docker build -f recipes/synthesis -t ghcr.io/pyfpga/synthesis .
-    - name: Push Docker image
-      run: docker push ghcr.io/pyfpga/synthesis
+    - name: Build Docker image for ${{ matrix.name }}
+      run: docker build -f recipes/${{ matrix.name }} -t ghcr.io/pyfpga/${{ matrix.name }} .
+    - name: Push Docker image for ${{ matrix.name }}
+      run: docker push ghcr.io/pyfpga/${{ matrix.name }}

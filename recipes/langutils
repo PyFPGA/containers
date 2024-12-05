@@ -1,0 +1,137 @@
+FROM ubuntu:latest AS build
+
+WORKDIR /root
+
+#
+# Dependencies
+#
+
+RUN apt update -qq \
+ && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+    # Common
+    build-essential \
+    ca-certificates \
+    curl \
+    git \
+    gnupg \
+    python3 \
+    wget \
+    zlib1g-dev \
+    # vhd2vl
+    flex \
+    bison \
+    iverilog \
+    # Surelog
+    cmake \
+    default-jre \
+    python3-orderedmultidict \
+ && curl -sSL https://get.haskellstack.org/ | sh \
+ && curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor -o /usr/share/keyrings/bazel-archive-keyring.gpg \
+ && echo "deb [signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] \
+    https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list \
+ && apt update -qq \
+ && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+    bazel \
+ && apt autoclean && apt clean && apt -y autoremove \
+ && rm -rf /var/lib/apt/lists/*
+
+#
+# vhd2vl
+#
+
+RUN git clone --depth 1 https://github.com/ldoolitt/vhd2vl \
+ && cd vhd2vl && make -j$(nproc) \
+ && cp src/vhd2vl /usr/local/bin
+
+#
+# Slang
+#
+
+RUN git clone --depth 1 https://github.com/MikePopoloski/slang.git \
+ && cd slang && cmake -B build && cmake --build build -j8 \
+ && cmake --install build --strip
+
+#
+# Surelog
+#
+
+RUN git clone --depth 1 https://github.com/alainmarcel/Surelog.git \
+ && cd Surelog && git submodule update --init --recursive \
+ && make -j$(nproc) && make install
+
+#
+# sv2v
+#
+
+RUN git clone --depth 1 https://github.com/zachjs/sv2v.git \
+ && cd sv2v && make -j$(nproc) && cp bin/sv2v /usr/local/bin
+
+#
+# Verible
+#
+
+RUN git clone --depth 1 https://github.com/chipsalliance/verible.git \
+ && cd verible && bazel build -c opt //... \
+ && bazel run -c opt :install -- /usr/local/bin
+
+###############################################################################
+
+## slang
+#/usr/local/lib/libfmt.a
+#/usr/local/include/fmt
+#/usr/local/lib/cmake/fmt
+#/usr/local/include/ieee1800
+#/usr/local/lib/libfmt.a
+#/usr/local/lib/libmimalloc.a
+#/usr/local/include/mimalloc-2.1
+#/usr/local/include/slang
+#/usr/local/include/slang
+#/usr/local/bin/slang
+#/usr/local/bin/slang-netlist
+#/usr/local/bin/slang-tidy
+#/usr/local/bin/slang-reflect
+#/usr/local/bin/slang-hier
+#/usr/local/lib/libsvlang.a
+#/usr/local/bin/slang
+#/usr/local/lib/cmake/slang
+#/usr/local/share/pkgconfig/sv-lang.pc
+
+## Surelog
+#/usr/local/lib/libcapnp.a
+#/usr/local/lib/libkj.a
+#/usr/local/lib/libuhdm.a
+#/usr/local/bin/uhdm-cmp
+#/usr/local/bin/uhdm-dump
+#/usr/local/bin/uhdm-hier
+#/usr/local/bin/uhdm-lint
+#/usr/local/include/uhdm
+#/usr/local/share/uhdm/UHDM.capnp
+#/usr/local/lib/cmake/UHDM
+#/usr/local/lib/pkgconfig/UHDM.pc
+#/usr/local/bin/surelog
+#/usr/local/bin/roundtrip
+#/usr/local/lib/libsurelog.a
+#/usr/local/lib/libantlr4-runtime.a
+#/usr/local/lib/libcapnp.a
+#/usr/local/lib/libkj.a
+#/usr/local/lib/libuhdm.a
+#/usr/local/share/surelog
+#/usr/local/include/Surelog
+#/usr/local/lib/cmake/Surelog
+#/usr/local/lib/pkgconfig/Surelog.pc
+
+## Verible
+#/usr/local/bin/git-verible-verilog-format.sh
+#/usr/local/bin/verible-patch-tool
+#/usr/local/bin/verible-transform-interactive.sh
+#/usr/local/bin/verible-verilog-diff
+#/usr/local/bin/verible-verilog-format
+#/usr/local/bin/verible-verilog-format-changed-lines-interactive.sh
+#/usr/local/bin/verible-verilog-kythe-extractor
+#/usr/local/bin/verible-verilog-kythe-kzip-writer
+#/usr/local/bin/verible-verilog-lint
+#/usr/local/bin/verible-verilog-ls
+#/usr/local/bin/verible-verilog-obfuscate
+#/usr/local/bin/verible-verilog-preprocessor
+#/usr/local/bin/verible-verilog-project
+#/usr/local/bin/verible-verilog-syntax
