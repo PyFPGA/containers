@@ -2,6 +2,10 @@ FROM ubuntu:latest AS build
 
 WORKDIR /root
 
+#
+# Dependencies
+#
+
 RUN apt update -qq \
  && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
     # Common
@@ -71,7 +75,6 @@ RUN cd /usr/local/lib && rm -fr libghdlvpi.so libghw.so python3.* \
 ###############################################################################
 
 FROM ubuntu:latest
-#gcr.io/distroless/static-debian12
 
 RUN apt update -qq \
  && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
@@ -81,8 +84,8 @@ RUN apt update -qq \
  && apt autoclean && apt clean && apt -y autoremove \
  && rm -rf /var/lib/apt/lists/*
 
-COPY --from=build /usr/local/bin          /usr/local/bin
-COPY --from=build /usr/local/lib          /usr/local/lib
-COPY --from=build /usr/local/include/ghdl /usr/local/include/ghdl
-COPY --from=build /usr/local/share/yosys  /usr/local/share/yosys
-COPY --from=build /usr/local/share/synlig /usr/local/share/synlig
+COPY --from=build /usr/local/bin                 /usr/local/bin
+COPY --from=build /usr/local/lib                 /usr/local/lib
+COPY --from=build /usr/local/include/ghdl        /usr/local/include/ghdl
+COPY --from=build /usr/local/share/yosys         /usr/local/share/yosys
+COPY --from=build /usr/local/share/synlig        /usr/local/share/synlig
