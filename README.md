@@ -11,4 +11,5 @@
   * [GHDL](https://github.com/ghdl/ghdl)
   * [Yosys](https://github.com/YosysHQ/yosys)
   * [ghdl-yosys-plugin](https://github.com/ghdl/ghdl-yosys-plugin)
+  * [yosys-slang](https://github.com/povik/yosys-slang)
   * [synlig](https://github.com/chipsalliance/synlig)

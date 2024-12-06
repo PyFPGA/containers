@@ -52,15 +52,24 @@ RUN git clone --depth 1 https://github.com/YosysHQ/yosys \
 # ghdl-yosys-plugin
 #
 
-RUN git clone --depth 1 https://github.com/ghdl/ghdl-yosys-plugin.git \
+RUN git clone --depth 1 https://github.com/ghdl/ghdl-yosys-plugin \
  && cd ghdl-yosys-plugin && git submodule update --init \
  && make -j$(nproc) && make install
+
+#
+# yosys-slang
+#
+
+RUN git clone --recursive https://github.com/povik/yosys-slang \
+ && cd yosys-slang && make -j$(nproc) \
+ && mkdir -p /usr/local/share/yosys/plugins \
+ && yosys-config --exec cp build/slang.so /usr/local/share/yosys/plugins
 
 #
 # Synlig
 #
 
-RUN git clone --depth 1 https://github.com/chipsalliance/synlig.git && cd synlig \
+RUN git clone --depth 1 https://github.com/chipsalliance/synlig && cd synlig \
  && git submodule update --init --depth 1 --recursive third_party/surelog \
  && git submodule update --init --depth 1 --recursive third_party/yosys \
  && make install -j$(nproc)
