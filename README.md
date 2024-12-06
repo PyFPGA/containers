@@ -6,7 +6,6 @@
   * [sv2v](https://github.com/zachjs/sv2v)
   * [Verible](https://github.com/chipsalliance/verible)
   * [Surelog](https://github.com/chipsalliance/Surelog)
-  * [sv-parser](https://github.com/dalance/sv-parser)
 * `synthesis`: tools for logic synthesis
   * [GHDL](https://github.com/ghdl/ghdl)
   * [Yosys](https://github.com/YosysHQ/yosys)
