@@ -1,5 +1,5 @@
 module counter #(
-  parameter WIDTH = 4
+  parameter int WIDTH = 4
 ) (
   input                    clk,
   input                    rst,
