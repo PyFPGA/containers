@@ -38,7 +38,7 @@ RUN apt update -qq \
 #
 
 RUN git clone --depth 1 https://github.com/ldoolitt/vhd2vl \
- && cd vhd2vl && make -j$(nproc) && cp src/vhd2vl /usr/local/bin
+ && cd vhd2vl && make -j$(nproc) && make install
 
 #
 # Slang
