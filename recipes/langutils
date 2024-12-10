@@ -13,23 +13,18 @@ RUN apt-get update -qq \
     ca-certificates \
     curl \
     git \
-    gnupg \
     python3 \
     zlib1g-dev \
     # vhd2vl
     flex \
     bison \
-    iverilog \
     # Surelog
     cmake \
     default-jre \
     python3-orderedmultidict \
  && curl -sSL https://get.haskellstack.org/ | sh \
- && curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor -o /usr/share/keyrings/bazel-archive-keyring.gpg \
- && echo "deb [signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] \
-    https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list \
- && apt-get update -qq \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends bazel \
+ && curl -sSL https://github.com/bazelbuild/bazel/releases/download/6.5.0/bazel-6.5.0-linux-x86_64 \
+    -o /usr/bin/bazel && chmod +x /usr/bin/bazel \
  && apt-get autoclean && apt-get clean && apt-get -y autoremove \
  && rm -rf /var/lib/apt/lists/*
 
@@ -67,9 +62,9 @@ RUN git clone --depth 1 https://github.com/zachjs/sv2v.git \
 # Verible
 #
 
-# RUN git clone --depth 1 https://github.com/chipsalliance/verible.git \
-#  && cd verible && bazel build -c opt //... \
-#  && bazel run -c opt :install -- /usr/local/bin
+RUN git clone --depth 1 https://github.com/chipsalliance/verible.git \
+ && cd verible && bazel build -c opt //... \
+ && bazel run -c opt :install -- /usr/local/bin
 
 #
 # Clean-up
