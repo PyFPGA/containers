@@ -67,9 +67,9 @@ RUN git clone --depth 1 https://github.com/zachjs/sv2v.git \
 # Verible
 #
 
-RUN git clone --depth 1 https://github.com/chipsalliance/verible.git \
- && cd verible && bazel build -c opt //... \
- && bazel run -c opt :install -- /usr/local/bin
+# RUN git clone --depth 1 https://github.com/chipsalliance/verible.git \
+#  && cd verible && bazel build -c opt //... \
+#  && bazel run -c opt :install -- /usr/local/bin
 
 #
 # Clean-up
