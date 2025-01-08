@@ -28,6 +28,9 @@ RUN apt-get update -qq \
     zlib1g \
     ccache \
     mold \
+    # cocotb
+    python3-pip \
+    libpython3-dev \
     libgoogle-perftools-dev numactl \
  && apt-get autoclean && apt-get clean && apt-get -y autoremove \
  && rm -rf /var/lib/apt/lists/*
@@ -56,6 +59,12 @@ RUN git clone --depth 1 https://github.com/steveicarus/iverilog \
 RUN git clone --depth 1 https://github.com/verilator/verilator \
  && cd verilator && autoconf && ./configure \
  && make -j$(nproc) && make install
+
+#
+# cocotb
+#
+
+RUN pip install cocotb --break-system-packages
 
 #
 # Clean-up
