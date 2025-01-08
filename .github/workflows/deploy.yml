@@ -1,6 +1,9 @@
 name: Deploy Docker Images
 
-on: [push]
+on:
+  push:
+  schedule:
+    - cron: '0 21 * * 5'
 
 jobs:
   deploy:
