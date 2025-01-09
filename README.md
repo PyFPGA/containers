@@ -12,3 +12,8 @@
   * [ghdl-yosys-plugin](https://github.com/ghdl/ghdl-yosys-plugin)
   * [yosys-slang](https://github.com/povik/yosys-slang)
   * [synlig](https://github.com/chipsalliance/synlig)
+* `simulation`: tools for simulation
+  * [GHDL](https://github.com/ghdl/ghdl)
+  * [iVerilog](https://github.com/steveicarus/iverilog)
+  * [Verilator](https://github.com/verilator/verilator)
+  * [cocotb](https://github.com/cocotb/cocotb)
