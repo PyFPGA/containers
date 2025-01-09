@@ -1,0 +1,75 @@
+FROM ubuntu:latest AS build
+
+WORKDIR /root
+
+#
+# Dependencies
+#
+
+RUN apt-get update -qq \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    # Common
+    build-essential \
+    ca-certificates \
+    git \
+    python3 \
+    zlib1g-dev \
+    # GHDL
+    gnat \
+    # iVerilog & Verilator
+    autoconf \
+    bison \
+    flex \
+    gperf \
+    # Verilator
+    help2man \
+    libfl2 \
+    libfl-dev \
+    zlib1g \
+    ccache \
+    mold \
+    # cocotb
+    python3-pip \
+    libpython3-dev \
+    libgoogle-perftools-dev numactl \
+ && apt-get autoclean && apt-get clean && apt-get -y autoremove \
+ && rm -rf /var/lib/apt/lists/*
+
+#
+# GHDL
+#
+
+RUN git clone --depth 1 https://github.com/ghdl/ghdl \
+ && mkdir ghdl/build && cd ghdl/build \
+ && ../configure --prefix=/usr/local \
+ && make -j$(nproc) && make install
+
+#
+# iVerilog
+#
+
+RUN git clone --depth 1 https://github.com/steveicarus/iverilog \
+ && cd iverilog && autoconf && ./configure \
+ && make -j$(nproc) && make install
+
+#
+# Verilator
+#
+
+RUN git clone --depth 1 https://github.com/verilator/verilator \
+ && cd verilator && autoconf && ./configure \
+ && make -j$(nproc) && make install
+
+#
+# cocotb
+#
+
+RUN pip install cocotb --break-system-packages
+
+#
+# Clean-up
+#
+
+###############################################################################
+
+# FROM ubuntu:latest
