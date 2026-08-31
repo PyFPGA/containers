@@ -22,6 +22,8 @@ RUN apt-get update -qq \
     cmake \
     default-jre \
     python3-orderedmultidict \
+    # svlint
+    unzip \
  && curl -sSL https://get.haskellstack.org/ | sh \
  && curl -sSL https://github.com/bazelbuild/bazel/releases/download/6.5.0/bazel-6.5.0-linux-x86_64 \
     -o /usr/bin/bazel && chmod +x /usr/bin/bazel \
@@ -65,6 +67,16 @@ RUN git clone --depth 1 https://github.com/zachjs/sv2v.git \
 RUN git clone --depth 1 https://github.com/chipsalliance/verible.git \
  && cd verible && bazel build -c opt :install-binaries \
  && .github/bin/simple-install.sh /usr/local/bin
+
+#
+# svlint
+#
+
+RUN LATEST_URL=$(curl -s https://api.github.com/repos/dalance/svlint/releases/latest | grep -o "https://[^\"]*x86_64-lnx.zip") \
+    && curl -sL "$LATEST_URL" -o /tmp/svlint.zip \
+    && unzip /tmp/svlint.zip -d /tmp/svlint \
+    && mv /tmp/svlint/bin/svlint /usr/local/bin/ \
+    && rm -rf /tmp/svlint /tmp/svlint.zip
 
 #
 # Clean-up
