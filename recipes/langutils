@@ -1,34 +1,28 @@
-FROM ubuntu:latest AS build
+FROM ubuntu:latest AS builder
 
-WORKDIR /root
+ENV DEBIAN_FRONTEND=noninteractive
 
-#
-# Dependencies
-#
-
-RUN apt-get update -qq \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    # Common
+RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+    bison \
     build-essential \
     ca-certificates \
+    cargo \
+    cmake \
     curl \
+    default-jre \
+    flex \
     git \
     python3 \
-    zlib1g-dev \
-    # vhd2vl
-    flex \
-    bison \
-    # Surelog
-    cmake \
-    default-jre \
     python3-orderedmultidict \
-    # svlint
-    unzip \
+ # sv2v
  && curl -sSL https://get.haskellstack.org/ | sh \
- && curl -sSL https://github.com/bazelbuild/bazel/releases/download/6.5.0/bazel-6.5.0-linux-x86_64 \
-    -o /usr/bin/bazel && chmod +x /usr/bin/bazel \
- && apt-get autoclean && apt-get clean && apt-get -y autoremove \
+ # verible
+ && curl -fsSL https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 \
+    -o /usr/local/bin/bazel && chmod +x /usr/local/bin/bazel \
+ # clean-up
  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /tmp
 
 #
 # vhd2vl
@@ -38,11 +32,18 @@ RUN git clone --depth 1 https://github.com/ldoolitt/vhd2vl \
  && cd vhd2vl && make -j$(nproc) && make install
 
 #
+# sv2v
+#
+
+RUN git clone --depth 1 https://github.com/zachjs/sv2v.git \
+ && cd sv2v && make -j$(nproc) && cp bin/sv2v /usr/local/bin
+
+#
 # Slang
 #
 
 RUN git clone --depth 1 https://github.com/MikePopoloski/slang.git \
- && cd slang && cmake -B build && cmake --build build -j8 \
+ && cd slang && cmake -B build && cmake --build build -j$(nproc) \
  && cmake --install build --strip
 
 #
@@ -51,14 +52,12 @@ RUN git clone --depth 1 https://github.com/MikePopoloski/slang.git \
 
 RUN git clone --depth 1 https://github.com/alainmarcel/Surelog.git \
  && cd Surelog && git submodule update --init --recursive \
- && make -j$(nproc) && make install
-
-#
-# sv2v
-#
-
-RUN git clone --depth 1 https://github.com/zachjs/sv2v.git \
- && cd sv2v && make -j$(nproc) && cp bin/sv2v /usr/local/bin
+ && cmake -B build \
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr/local \
+ && cmake --build build -j$(nproc) \
+ && cmake --install build --strip
 
 #
 # Verible
@@ -72,25 +71,21 @@ RUN git clone --depth 1 https://github.com/chipsalliance/verible.git \
 # svlint
 #
 
-RUN LATEST_URL=$(curl -s https://api.github.com/repos/dalance/svlint/releases/latest | grep -o "https://[^\"]*x86_64-lnx.zip") \
-    && curl -sL "$LATEST_URL" -o /tmp/svlint.zip \
-    && unzip /tmp/svlint.zip -d /tmp/svlint \
-    && mv /tmp/svlint/bin/svlint /usr/local/bin/ \
-    && rm -rf /tmp/svlint /tmp/svlint.zip
+RUN cargo install --root /usr/local --git https://github.com/dalance/svlint.git svlint
 
 #
-# Clean-up
+# clean-up
 #
 
-RUN cd /usr/local/bin && rm stack
+RUN rm -f /usr/local/bin/stack /usr/local/bin/bazel
 
-###############################################################################
+# -----------------------------------------------------------------------------
 
-FROM ubuntu:latest
+FROM ubuntu:latest AS runtime
 
-COPY --from=build /usr/local/bin                 /usr/local/bin
-COPY --from=build /usr/local/lib                 /usr/local/lib
-COPY --from=build /usr/local/include             /usr/local/include
-COPY --from=build /usr/local/share/pkgconfig     /usr/local/share/pkgconfig
-COPY --from=build /usr/local/share/surelog       /usr/local/share/surelog
-COPY --from=build /usr/local/share/uhdm          /usr/local/share/uhdm
+COPY --from=builder /usr/local/bin                 /usr/local/bin
+COPY --from=builder /usr/local/lib                 /usr/local/lib
+COPY --from=builder /usr/local/include             /usr/local/include
+COPY --from=builder /usr/local/share/pkgconfig     /usr/local/share/pkgconfig
+COPY --from=builder /usr/local/share/surelog       /usr/local/share/surelog
+COPY --from=builder /usr/local/share/uhdm          /usr/local/share/uhdm
