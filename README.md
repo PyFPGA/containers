@@ -8,6 +8,7 @@ Below is a list of the available containers and their included tools.
   * [vhd2vl](https://github.com/ldoolitt/vhd2vl)
   * [Slang](https://github.com/MikePopoloski/slang)
   * [sv2v](https://github.com/zachjs/sv2v)
+  * [svlint](https://github.com/dalance/svlint)
   * [Verible](https://github.com/chipsalliance/verible)
   * [Surelog](https://github.com/chipsalliance/Surelog)
 * `synthesis`: tools for logic synthesis

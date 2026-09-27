@@ -11,11 +11,13 @@ $DOCKER slang --version
 $DOCKER surelog --version
 $DOCKER sv2v --version
 $DOCKER verible-verilog-syntax --version
+$DOCKER svlint --version
 
 $DOCKER vhd2vl --quiet hdl/counter.vhdl results/vhd2vl.v
 $DOCKER slang hdl/counter.sv --lint-only
 $DOCKER surelog -parse hdl/counter.sv
 $DOCKER sv2v hdl/counter.sv --write=results/sv2v.v
 $DOCKER verible-verilog-lint hdl/counter.sv
+$DOCKER svlint hdl/counter.sv
 
 rm -fr slpp_all
