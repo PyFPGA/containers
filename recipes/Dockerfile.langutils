@@ -1,0 +1,80 @@
+FROM ubuntu:latest AS builder
+
+WORKDIR /tmp
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -qq
+RUN apt-get install -y --no-install-recommends ca-certificates git
+RUN apt-get install -y --no-install-recommends build-essential cmake curl \
+    cargo default-jre flex bison python3 python3-orderedmultidict
+
+#
+# vhd2vl
+#
+
+RUN git clone --depth 1 https://github.com/ldoolitt/vhd2vl
+RUN cd vhd2vl && make -j$(nproc) && make install
+
+#
+# sv2v
+#
+
+RUN curl -sSL https://get.haskellstack.org/ | sh
+
+RUN git clone --depth 1 https://github.com/zachjs/sv2v.git
+RUN cd sv2v && make -j$(nproc) && cp bin/sv2v /usr/local/bin
+
+#
+# Slang
+#
+
+RUN git clone --depth 1 https://github.com/MikePopoloski/slang.git
+RUN cd slang && cmake -B build && cmake --build build -j$(nproc) \
+ && cmake --install build --strip
+
+#
+# Surelog
+#
+
+RUN git clone --depth 1 https://github.com/alainmarcel/Surelog.git
+RUN cd Surelog && git submodule update --init --depth 1 --recursive \
+ && cmake -B build \
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr/local \
+ && cmake --build build -j$(nproc) \
+ && cmake --install build --strip
+
+#
+# Verible
+#
+
+RUN curl -fsSL https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 \
+    -o /usr/local/bin/bazel && chmod +x /usr/local/bin/bazel
+
+RUN git clone --depth 1 https://github.com/chipsalliance/verible.git
+RUN cd verible && bazel build -c opt :install-binaries \
+ && .github/bin/simple-install.sh /usr/local/bin
+
+#
+# svlint
+#
+
+RUN cargo install --root /usr/local --git https://github.com/dalance/svlint.git svlint
+
+#
+# clean-up
+#
+
+RUN rm -f /usr/local/bin/stack /usr/local/bin/bazel
+
+#------------------------------------------------------------------------------
+
+FROM ubuntu:latest AS runtime
+
+COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=builder /usr/local/lib /usr/local/lib
+COPY --from=builder /usr/local/include /usr/local/include
+COPY --from=builder /usr/local/share/surelog /usr/local/share/surelog
+COPY --from=builder /usr/local/share/uhdm /usr/local/share/uhdm

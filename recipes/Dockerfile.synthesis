@@ -1,0 +1,93 @@
+FROM ubuntu:latest AS builder
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+    # Common
+    build-essential \
+    ca-certificates \
+    git \
+    zlib1g-dev \
+    # GHDL
+    gnat \
+    # Yosys
+    clang \
+    bison \
+    flex \
+    libreadline-dev \
+    tcl-dev \
+    libffi-dev \
+    pkg-config \
+    python3 \
+    # Synlig
+    cmake \
+    default-jre \
+    python3-orderedmultidict \
+ && apt-get autoclean && apt-get clean && apt-get -y autoremove \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /tmp
+
+#
+# GHDL
+#
+
+RUN git clone --depth 1 https://github.com/ghdl/ghdl \
+ && mkdir ghdl/build && cd ghdl/build \
+ && ../configure --prefix=/usr/local \
+ && make -j$(nproc) && make install
+
+#
+# Yosys
+#
+
+RUN git clone --depth 1 https://github.com/YosysHQ/yosys \
+ && cd yosys && git submodule update --init --depth 1 \
+ && cmake -B build . -DCMAKE_BUILD_TYPE=Release \
+ && cmake --build build --config Release -j$(nproc) \
+ && cmake --install build --strip
+
+#
+# ghdl-yosys-plugin
+#
+
+RUN git clone --depth 1 https://github.com/ghdl/ghdl-yosys-plugin \
+ && cd ghdl-yosys-plugin && git submodule update --init --depth 1 \
+ && make -j$(nproc) && make install
+
+#
+# Synlig
+#
+
+RUN git clone --depth 1 https://github.com/chipsalliance/synlig && cd synlig \
+ && git submodule update --init --depth 1 --recursive third_party/surelog \
+ && git submodule update --init --depth 1 --recursive third_party/yosys \
+ && find third_party -name "CMakeLists.txt" -exec sed -i -E 's/cmake_minimum_required\s*\([^)]+\)/cmake_minimum_required(VERSION 3.5)/gI' {} + \
+ && sed -i '1s/^/#include <cstdint>\n/' third_party/yosys/libs/json11/json11.cpp \
+ && make install -j$(nproc)
+# && CMAKE_POLICY_VERSION_MINIMUM=3.5 make install -j$(nproc)
+
+#
+# clean-up
+#
+
+RUN cd /usr/local/lib && rm -fr libghdlvpi.so libghw.so python3.* \
+ && cd /usr/local/bin && rm ghwdump yosys-filterlib yosys-smtbmc yosys-witness
+
+# -----------------------------------------------------------------------------
+
+# FROM ubuntu:latest AS runtime
+
+# RUN apt-get update -qq \
+#  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+#     gnat \
+#     libreadline-dev \
+#     tcl-dev \
+#  && apt-get autoclean && apt-get clean && apt-get -y autoremove \
+#  && rm -rf /var/lib/apt/lists/*
+
+# COPY --from=builder /usr/local/bin                 /usr/local/bin
+# COPY --from=builder /usr/local/lib                 /usr/local/lib
+# COPY --from=builder /usr/local/include/ghdl        /usr/local/include/ghdl
+# COPY --from=builder /usr/local/share/yosys         /usr/local/share/yosys
+# COPY --from=builder /usr/local/share/synlig        /usr/local/share/synlig
