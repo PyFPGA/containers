@@ -15,7 +15,7 @@ Below is a list of the available containers and their included tools.
   * [GHDL](https://github.com/ghdl/ghdl)
   * [Yosys](https://github.com/YosysHQ/yosys)
   * [ghdl-yosys-plugin](https://github.com/ghdl/ghdl-yosys-plugin)
-  * [yosys-slang](https://github.com/povik/yosys-slang)
+  * [sv-elab](https://github.com/povik/sv-elab)
   * [synlig](https://github.com/chipsalliance/synlig)
 * `simulation`: tools for simulation
   * [GHDL](https://github.com/ghdl/ghdl)
