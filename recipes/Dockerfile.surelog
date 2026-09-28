@@ -24,8 +24,4 @@ RUN cd Surelog && git submodule update --init --depth 1 --recursive \
 
 FROM ubuntu:latest AS runtime
 
-COPY --from=builder /usr/local/bin /usr/local/bin
-COPY --from=builder /usr/local/lib /usr/local/lib
-COPY --from=builder /usr/local/include /usr/local/include
-COPY --from=builder /usr/local/share/surelog /usr/local/share/surelog
-COPY --from=builder /usr/local/share/uhdm /usr/local/share/uhdm
+COPY --from=builder /usr/local /usr/local
