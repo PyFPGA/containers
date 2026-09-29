@@ -5,9 +5,19 @@ WORKDIR /tmp
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -qq
-RUN apt-get install -y --no-install-recommends ca-certificates git
-RUN apt-get install -y --no-install-recommends build-essential cmake curl \
-    cargo default-jre flex bison python3 python3-orderedmultidict
+RUN apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git
+RUN apt-get install -y --no-install-recommends \
+    bison \
+    build-essential \
+    cargo \
+    cmake \
+    curl \
+    default-jre \
+    flex \
+    python3 \
+    python3-orderedmultidict
 
 #
 # vhd2vl
@@ -74,3 +84,5 @@ RUN rm -f /usr/local/bin/stack /usr/local/bin/bazel
 FROM ubuntu:latest AS runtime
 
 COPY --from=builder /usr/local /usr/local
+
+RUN ldconfig

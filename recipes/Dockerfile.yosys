@@ -7,10 +7,17 @@ WORKDIR /tmp
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -qq
-RUN apt-get install -y --no-install-recommends ca-certificates git
-RUN apt-get install -y --no-install-recommends build-essential cmake python3
-RUN apt-get install -y --no-install-recommends bison flex
-RUN apt-get install -y --no-install-recommends gnat zlib1g-dev
+RUN apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git
+RUN apt-get install -y --no-install-recommends \
+    bison \
+    build-essential \
+    cmake \
+    flex \
+    gnat \
+    python3 \
+    zlib1g-dev
 
 RUN git clone --depth 1 https://github.com/ghdl/ghdl
 RUN mkdir ghdl/build && cd ghdl/build && ../configure --prefix=/usr/local \

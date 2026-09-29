@@ -7,8 +7,13 @@ WORKDIR /tmp
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -qq
-RUN apt-get install -y --no-install-recommends ca-certificates git
-RUN apt-get install -y --no-install-recommends build-essential flex bison
+RUN apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git
+RUN apt-get install -y --no-install-recommends \
+    bison \
+    build-essential \
+    flex
 
 RUN git clone --depth 1 https://github.com/ldoolitt/vhd2vl
 RUN cd vhd2vl && make -j$(nproc) && make install

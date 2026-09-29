@@ -7,8 +7,13 @@ WORKDIR /tmp
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -qq
-RUN apt-get install -y --no-install-recommends ca-certificates git
-RUN apt-get install -y --no-install-recommends build-essential cmake python3
+RUN apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git
+RUN apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    python3
 
 RUN git clone --depth 1 https://github.com/MikePopoloski/slang.git
 RUN cd slang && cmake -B build && cmake --build build -j$(nproc) \

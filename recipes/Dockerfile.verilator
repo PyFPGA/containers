@@ -7,9 +7,17 @@ WORKDIR /tmp
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -qq
-RUN apt-get install -y --no-install-recommends ca-certificates git
-RUN apt-get install -y --no-install-recommends autoconf build-essential bison flex
-RUN apt-get install -y --no-install-recommends python3 libfl-dev help2man
+RUN apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git
+RUN apt-get install -y --no-install-recommends \
+    autoconf \
+    bison \
+    build-essential \
+    flex \
+    help2man \
+    libfl-dev \
+    python3
 
 RUN git clone --depth 1 https://github.com/verilator/verilator
 RUN cd verilator && autoconf && ./configure \

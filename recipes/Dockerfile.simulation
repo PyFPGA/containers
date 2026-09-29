@@ -5,10 +5,20 @@ WORKDIR /tmp
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -qq
-RUN apt-get install -y --no-install-recommends ca-certificates git
-RUN apt-get install -y --no-install-recommends autoconf build-essential bison flex
-RUN apt-get install -y --no-install-recommends autoconf gnat zlib1g-dev libfl-dev
-RUN apt-get install -y --no-install-recommends python3 gperf help2man
+RUN apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git
+RUN apt-get install -y --no-install-recommends \
+    autoconf \
+    bison \
+    build-essential \
+    flex \
+    gnat \
+    gperf \
+    help2man \
+    libfl-dev \
+    python3 \
+    zlib1g-dev
 
 #
 # ghdl

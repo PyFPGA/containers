@@ -7,9 +7,15 @@ WORKDIR /tmp
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -qq
-RUN apt-get install -y --no-install-recommends ca-certificates git
-RUN apt-get install -y --no-install-recommends build-essential cmake default-jre \
-    python3 python3-orderedmultidict
+RUN apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git
+RUN apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    default-jre \
+    python3 \
+    python3-orderedmultidict
 
 RUN git clone --depth 1 https://github.com/alainmarcel/Surelog.git
 RUN cd Surelog && git submodule update --init --depth 1 --recursive \

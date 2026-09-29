@@ -7,9 +7,15 @@ WORKDIR /tmp
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -qq
-RUN apt-get install -y --no-install-recommends ca-certificates git
-RUN apt-get install -y --no-install-recommends build-essential bison flex
-RUN apt-get install -y --no-install-recommends autoconf gperf
+RUN apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git
+RUN apt-get install -y --no-install-recommends \
+    autoconf \
+    bison \
+    build-essential \
+    flex \
+    gperf
 
 RUN git clone --depth 1 https://github.com/steveicarus/iverilog
 RUN cd iverilog && autoconf && ./configure \

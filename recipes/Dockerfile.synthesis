@@ -5,12 +5,22 @@ WORKDIR /tmp
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -qq
-RUN apt-get install -y --no-install-recommends ca-certificates git
-RUN apt-get install -y --no-install-recommends build-essential cmake default-jre
-RUN apt-get install -y --no-install-recommends bison flex pkg-config
-RUN apt-get install -y --no-install-recommends gnat zlib1g-dev
-RUN apt-get install -y --no-install-recommends python3-orderedmultidict
-RUN apt-get install -y --no-install-recommends tcl-dev libreadline-dev libffi-dev
+RUN apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git
+RUN apt-get install -y --no-install-recommends \
+    bison \
+    build-essential \
+    cmake \
+    default-jre \
+    flex \
+    gnat \
+    libffi-dev \
+    libreadline-dev \
+    pkg-config \
+    python3-orderedmultidict \
+    tcl-dev \
+    zlib1g-dev
 
 #
 # GHDL
