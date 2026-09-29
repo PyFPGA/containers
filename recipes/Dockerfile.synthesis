@@ -64,13 +64,13 @@ RUN cd synlig \
 
 FROM ubuntu:latest AS runtime
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update -qq && apt-get install -y --no-install-recommends \
     libffi-dev \
     tcl-dev \
+    libgnat-14 \
     libreadline-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local /usr/local
-COPY --from=builder /usr/lib/x86_64-linux-gnu/libgnat-14.so* /usr/local/lib/
 
 RUN ldconfig
