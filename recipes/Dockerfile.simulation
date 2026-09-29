@@ -1,75 +1,49 @@
-FROM ubuntu:latest AS build
+FROM ubuntu:latest AS builder
 
-WORKDIR /root
+WORKDIR /tmp
 
-#
-# Dependencies
-#
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update -qq \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    # Common
-    build-essential \
-    ca-certificates \
-    git \
-    python3 \
-    zlib1g-dev \
-    # GHDL
-    gnat \
-    # iVerilog & Verilator
-    autoconf \
-    bison \
-    flex \
-    gperf \
-    # Verilator
-    help2man \
-    libfl2 \
-    libfl-dev \
-    zlib1g \
-    ccache \
-    mold \
-    # cocotb
-    python3-pip \
-    libpython3-dev \
-    libgoogle-perftools-dev numactl \
- && apt-get autoclean && apt-get clean && apt-get -y autoremove \
- && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -qq
+RUN apt-get install -y --no-install-recommends ca-certificates git
+RUN apt-get install -y --no-install-recommends autoconf build-essential bison flex
+RUN apt-get install -y --no-install-recommends autoconf gnat zlib1g-dev libfl-dev
+RUN apt-get install -y --no-install-recommends python3 gperf help2man
 
 #
-# GHDL
+# ghdl
 #
 
-RUN git clone --depth 1 https://github.com/ghdl/ghdl \
- && mkdir ghdl/build && cd ghdl/build \
- && ../configure --prefix=/usr/local \
+RUN git clone --depth 1 https://github.com/ghdl/ghdl
+RUN mkdir ghdl/build && cd ghdl/build && ../configure --prefix=/usr/local \
  && make -j$(nproc) && make install
 
 #
 # iVerilog
 #
 
-RUN git clone --depth 1 https://github.com/steveicarus/iverilog \
- && cd iverilog && autoconf && ./configure \
+RUN git clone --depth 1 https://github.com/steveicarus/iverilog
+RUN cd iverilog && autoconf && ./configure \
  && make -j$(nproc) && make install
 
 #
 # Verilator
 #
 
-RUN git clone --depth 1 https://github.com/verilator/verilator \
- && cd verilator && autoconf && ./configure \
+RUN git clone --depth 1 https://github.com/verilator/verilator
+RUN cd verilator && autoconf && ./configure \
  && make -j$(nproc) && make install
 
 #
 # cocotb
 #
 
-RUN pip install cocotb --break-system-packages
+# RUN pip install cocotb --break-system-packages
 
-#
-# Clean-up
-#
+#------------------------------------------------------------------------------
 
-###############################################################################
+FROM ubuntu:latest AS runtime
 
-# FROM ubuntu:latest
+COPY --from=builder /usr/local /usr/local
+
+RUN ldconfig

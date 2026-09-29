@@ -1,0 +1,24 @@
+# https://github.com/verilator/verilator
+
+FROM ubuntu:latest AS builder
+
+WORKDIR /tmp
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -qq
+RUN apt-get install -y --no-install-recommends ca-certificates git
+RUN apt-get install -y --no-install-recommends autoconf build-essential bison flex
+RUN apt-get install -y --no-install-recommends python3 libfl-dev help2man
+
+RUN git clone --depth 1 https://github.com/verilator/verilator
+RUN cd verilator && autoconf && ./configure \
+ && make -j$(nproc) && make install
+
+#------------------------------------------------------------------------------
+
+FROM ubuntu:latest AS runtime
+
+COPY --from=builder /usr/local /usr/local
+
+RUN ldconfig
