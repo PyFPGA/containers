@@ -20,3 +20,5 @@ RUN cargo install --root /usr/local --git https://github.com/dalance/svlint.git 
 FROM ubuntu:latest AS runtime
 
 COPY --from=builder /usr/local /usr/local
+
+RUN ldconfig

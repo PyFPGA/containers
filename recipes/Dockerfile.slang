@@ -24,3 +24,5 @@ RUN cd slang && cmake -B build && cmake --build build -j$(nproc) \
 FROM ubuntu:latest AS runtime
 
 COPY --from=builder /usr/local /usr/local
+
+RUN ldconfig

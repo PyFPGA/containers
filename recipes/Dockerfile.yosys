@@ -38,3 +38,5 @@ RUN cd ghdl-yosys-plugin && git submodule update --init --depth 1 \
 FROM ubuntu:latest AS runtime
 
 COPY --from=builder /usr/local /usr/local/bin
+
+RUN ldconfig

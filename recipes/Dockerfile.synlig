@@ -34,3 +34,5 @@ RUN cd synlig \
 FROM ubuntu:latest AS runtime
 
 COPY --from=builder /usr/local /usr/local
+
+RUN ldconfig

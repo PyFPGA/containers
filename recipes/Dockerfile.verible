@@ -28,3 +28,5 @@ RUN rm -f /usr/local/bin/bazel
 FROM ubuntu:latest AS runtime
 
 COPY --from=builder /usr/local /usr/local
+
+RUN ldconfig

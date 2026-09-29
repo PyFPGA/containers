@@ -24,3 +24,5 @@ RUN mkdir ghdl/build && cd ghdl/build && ../configure --prefix=/usr/local \
 FROM ubuntu:latest AS runtime
 
 COPY --from=builder /usr/local /usr/local
+
+RUN ldconfig

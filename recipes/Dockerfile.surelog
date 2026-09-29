@@ -31,3 +31,5 @@ RUN cd Surelog && git submodule update --init --depth 1 --recursive \
 FROM ubuntu:latest AS runtime
 
 COPY --from=builder /usr/local /usr/local
+
+RUN ldconfig
