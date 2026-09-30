@@ -8,7 +8,7 @@ mkdir -p results
 
 $DOCKER ghdl --version
 $DOCKER yosys -m ghdl -V
-$DOCKER yosys -m slang -V
+$DOCKER yosys -V
 $DOCKER synlig -V
 
 $DOCKER ghdl synth --workdir=results hdl/counter.vhdl -e counter > results/ghdl.vhdl
@@ -27,7 +27,6 @@ write_verilog -noattr results/yosys.v
 '
 
 $DOCKER yosys -Q -p '
-plugin -i slang
 read_slang hdl/counter.sv -top counter
 write_verilog -noattr results/yosys-slang.v
 '

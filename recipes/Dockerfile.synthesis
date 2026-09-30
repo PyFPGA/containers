@@ -1,0 +1,76 @@
+FROM ubuntu:latest AS builder
+
+WORKDIR /tmp
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -qq
+RUN apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git
+RUN apt-get install -y --no-install-recommends \
+    bison \
+    build-essential \
+    cmake \
+    default-jre \
+    flex \
+    gnat \
+    libffi-dev \
+    libreadline-dev \
+    pkg-config \
+    python3-orderedmultidict \
+    tcl-dev \
+    zlib1g-dev
+
+#
+# GHDL
+#
+
+RUN git clone --depth 1 https://github.com/ghdl/ghdl
+RUN mkdir ghdl/build && cd ghdl/build && ../configure --prefix=/usr/local \
+ && make -j$(nproc) && make install
+
+#
+# Yosys
+#
+
+RUN git clone --depth 1 https://github.com/YosysHQ/yosys
+RUN cd yosys && git submodule update --init --depth 1 \
+ && cmake -B build . -DCMAKE_BUILD_TYPE=Release \
+ && cmake --build build --config Release -j$(nproc) \
+ && cmake --install build --strip
+
+#
+# ghdl-yosys-plugin
+#
+
+RUN git clone --depth 1 https://github.com/ghdl/ghdl-yosys-plugin
+RUN cd ghdl-yosys-plugin && git submodule update --init --depth 1 \
+ && make -j$(nproc) && make install
+
+#
+# Synlig
+#
+
+RUN git clone --depth 1 https://github.com/chipsalliance/synlig
+RUN cd synlig \
+ && git submodule update --init --depth 1 --recursive third_party/surelog \
+ && git submodule update --init --depth 1 --recursive third_party/yosys \
+ && find third_party -name "CMakeLists.txt" -exec sed -i -E 's/cmake_minimum_required\s*\([^)]+\)/cmake_minimum_required(VERSION 3.5)/gI' {} + \
+ && sed -i '1s/^/#include <cstdint>\n/' third_party/yosys/libs/json11/json11.cpp \
+ && make install -j$(nproc)
+
+#------------------------------------------------------------------------------
+
+FROM ubuntu:latest AS runtime
+
+RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+    libffi-dev \
+    tcl-dev \
+    libgnat-14 \
+    libreadline-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /usr/local /usr/local
+
+RUN ldconfig
