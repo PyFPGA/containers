@@ -3,9 +3,9 @@ name: Deploy Docker Images
 on:
   push:
     paths:
-      - 'recipes/Dockerfile.langutils'
-      - 'recipes/Dockerfile.synthesis'
-      - 'recipes/Dockerfile.simulation'
+      - 'dockerfiles/Dockerfile.langutils'
+      - 'dockerfiles/Dockerfile.synthesis'
+      - 'dockerfiles/Dockerfile.simulation'
   schedule:
     - cron: '0 21 * * 5'
 
