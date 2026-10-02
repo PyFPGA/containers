@@ -5,47 +5,68 @@ WORKDIR /tmp
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -qq
+
 RUN apt-get install -y --no-install-recommends \
     ca-certificates \
     git
+
 RUN apt-get install -y --no-install-recommends \
-    bison \
-    build-essential \
     cargo \
     cmake \
     curl \
     default-jre \
-    flex \
     python3 \
     python3-orderedmultidict
 
 #
-# vhd2vl
+# vhd2vl (https://github.com/ldoolitt/vhd2vl)
 #
+
+RUN apt-get install -y --no-install-recommends \
+    bison \
+    build-essential \
+    flex
 
 RUN git clone --depth 1 https://github.com/ldoolitt/vhd2vl
 RUN cd vhd2vl && make -j$(nproc) && make install
 
 #
-# sv2v
+# sv2v (https://github.com/zachjs/sv2v)
 #
+
+RUN apt-get install -y --no-install-recommends \
+    curl
 
 RUN curl -sSL https://get.haskellstack.org/ | sh
 
 RUN git clone --depth 1 https://github.com/zachjs/sv2v.git
 RUN cd sv2v && make -j$(nproc) && cp bin/sv2v /usr/local/bin
 
+RUN rm -f /usr/local/bin/stack
+
 #
-# Slang
+# Slang (https://github.com/MikePopoloski/slang)
 #
+
+RUN apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    python3
 
 RUN git clone --depth 1 https://github.com/MikePopoloski/slang.git
 RUN cd slang && cmake -B build && cmake --build build -j$(nproc) \
  && cmake --install build --strip
 
 #
-# Surelog
+# Surelog (https://github.com/chipsalliance/Surelog)
 #
+
+RUN apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    default-jre \
+    python3 \
+    python3-orderedmultidict
 
 RUN git clone --depth 1 https://github.com/alainmarcel/Surelog.git
 RUN cd Surelog && git submodule update --init --depth 1 --recursive \
@@ -57,8 +78,12 @@ RUN cd Surelog && git submodule update --init --depth 1 --recursive \
  && cmake --install build --strip
 
 #
-# Verible
+# Verible (https://github.com/chipsalliance/verible)
 #
+
+RUN apt-get install -y --no-install-recommends \
+    build-essential \
+    curl
 
 RUN curl -fsSL https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 \
     -o /usr/local/bin/bazel && chmod +x /usr/local/bin/bazel
@@ -67,9 +92,14 @@ RUN git clone --depth 1 https://github.com/chipsalliance/verible.git
 RUN cd verible && bazel build -c opt :install-binaries \
  && .github/bin/simple-install.sh /usr/local/bin
 
+RUN rm -f /usr/local/bin/bazel
+
 #
-# svlint
+# svlint (https://github.com/dalance/svlint)
 #
+
+RUN apt-get install -y --no-install-recommends \
+    cargo
 
 RUN cargo install --root /usr/local --git https://github.com/dalance/svlint.git svlint
 
