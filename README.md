@@ -13,15 +13,23 @@ Below is a list of the available containers and their included tools.
   * [Surelog](https://github.com/chipsalliance/Surelog)
 * `synthesis`: tools for logic synthesis
   * [GHDL](https://github.com/ghdl/ghdl)
-  * [Yosys](https://github.com/YosysHQ/yosys)
+  * [Yosys](https://github.com/YosysHQ/yosys) (now including [sv-elab](https://github.com/povik/sv-elab))
   * [ghdl-yosys-plugin](https://github.com/ghdl/ghdl-yosys-plugin)
-  * [sv-elab](https://github.com/povik/sv-elab)
   * [synlig](https://github.com/chipsalliance/synlig)
 * `simulation`: tools for simulation
   * [GHDL](https://github.com/ghdl/ghdl)
   * [iVerilog](https://github.com/steveicarus/iverilog)
   * [Verilator](https://github.com/verilator/verilator)
   * [cocotb](https://github.com/cocotb/cocotb)
+`icestorm`: place & route and bitstream generation for Lattice iCE40 FPGAs
+* [icestrom](https://github.com/YosysHQ/icestorm)
+* [nextpnr](https://github.com/YosysHQ/nextpnr)
+`trellis`:place & route and bitstream generation for Lattice ECP5 FPGAs
+* [trellis](https://github.com/YosysHQ/prjtrellis)
+* [nextpnr](https://github.com/YosysHQ/nextpnr)
+`apicula`: place & route and bitstream generation for Gowin FPGAs
+* [apicula](https://github.com/yosyshq/apicula)
+* [nextpnr](https://github.com/YosysHQ/nextpnr)
 
 In the CI pipeline, the Dockerfile is used to build a Docker image, which is then pushed to the GitHub Container Registry.
 From there, it can be pulled and run as a container whenever needed.
