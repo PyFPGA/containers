@@ -21,15 +21,10 @@ Below is a list of the available containers and their included tools.
   * [iVerilog](https://github.com/steveicarus/iverilog)
   * [Verilator](https://github.com/verilator/verilator)
   * [cocotb](https://github.com/cocotb/cocotb)
-`icestorm`: place & route and bitstream generation for Lattice iCE40 FPGAs
-* [icestrom](https://github.com/YosysHQ/icestorm)
-* [nextpnr](https://github.com/YosysHQ/nextpnr)
-`trellis`:place & route and bitstream generation for Lattice ECP5 FPGAs
-* [trellis](https://github.com/YosysHQ/prjtrellis)
-* [nextpnr](https://github.com/YosysHQ/nextpnr)
-`apicula`: place & route and bitstream generation for Gowin FPGAs
-* [apicula](https://github.com/yosyshq/apicula)
-* [nextpnr](https://github.com/YosysHQ/nextpnr)
+* [nextpnr](https://github.com/YosysHQ/nextpnr) based containers: place and route + bitstream manipulation
+  * `nextpnr-apicula`: for gowin FPGAs ([apicula](https://github.com/yosyshq/apicula))
+  * `nextpnr-icestorm`: for Lattice iCe40 FPGAs ([icestrom](https://github.com/YosysHQ/icestorm))
+  * `nextpnr-trellis`: for Lattice ecp5 FPGAs ([trellis](https://github.com/YosysHQ/prjtrellis))
 
 In the CI pipeline, the Dockerfile is used to build a Docker image, which is then pushed to the GitHub Container Registry.
 From there, it can be pulled and run as a container whenever needed.
