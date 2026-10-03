@@ -1,0 +1,52 @@
+# https://github.com/YosysHQ/prjtrellis
+# https://github.com/YosysHQ/nextpnr
+
+FROM ubuntu:latest AS builder
+
+WORKDIR /tmp
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -qq
+RUN apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git
+RUN apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    libboost-all-dev \
+    libeigen3-dev \
+    openocd \
+    python3-dev
+
+#
+# Trellis
+#
+
+RUN git clone --depth 1 --recursive https://github.com/YosysHQ/prjtrellis
+RUN cd prjtrellis/libtrellis && cmake -DCMAKE_INSTALL_PREFIX=/usr/local . \
+ && make -j$(nproc) && make install
+
+#
+# NextPNR
+#
+
+RUN git clone --depth 1 https://github.com/YosysHQ/nextpnr
+RUN cd nextpnr && git submodule update --init --recursive \
+ && mkdir -p build && cd build \
+ && cmake .. -DARCH=ecp5 -DTRELLIS_INSTALL_PREFIX=/usr/local \
+ && make -j$(nproc) && make install
+
+#
+# Optimization
+#
+
+RUN strip /usr/local/bin/* 2>/dev/null || true
+
+#------------------------------------------------------------------------------
+
+FROM ubuntu:latest AS runtime
+
+COPY --from=builder /usr/local /usr/local
+
+RUN ldconfig

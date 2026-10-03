@@ -3,9 +3,12 @@ name: Deploy Docker Images
 on:
   push:
     paths:
-      - 'recipes/Dockerfile.langutils'
-      - 'recipes/Dockerfile.synthesis'
-      - 'recipes/Dockerfile.simulation'
+      - 'dockerfiles/Dockerfile.langutils'
+      - 'dockerfiles/Dockerfile.synthesis'
+      - 'dockerfiles/Dockerfile.simulation'
+      - 'dockerfiles/Dockerfile.nextpnr-apicula'
+      - 'dockerfiles/Dockerfile.nextpnr-icestorm'
+      - 'dockerfiles/Dockerfile.nextpnr-trellis'
   schedule:
     - cron: '0 21 * * 5'
 
@@ -19,6 +22,9 @@ jobs:
           - langutils
           - synthesis
           - simulation
+          - nextpnr-apicula
+          - nextpnr-icestorm
+          - nextpnr-trellis
     steps:
     - uses: actions/checkout@v2
     - name: Login to GitHub Container Registry
@@ -28,6 +34,6 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build Docker image for ${{ matrix.name }}
-      run: docker build -f recipes/Dockerfile.${{ matrix.name }} -t ghcr.io/pyfpga/${{ matrix.name }} .
+      run: docker build -f dockerfiles/Dockerfile.${{ matrix.name }} -t ghcr.io/pyfpga/${{ matrix.name }} .
     - name: Push Docker image for ${{ matrix.name }}
       run: docker push ghcr.io/pyfpga/${{ matrix.name }}

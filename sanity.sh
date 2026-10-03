@@ -2,7 +2,7 @@
 
 set -e
 
-for dockerfile in "recipes"/Dockerfile.*; do
+for dockerfile in "dockerfiles"/Dockerfile.*; do
   name="${dockerfile##*Dockerfile.}"
   echo "Processing target: ${name}"
   bash build.sh "${name}"
