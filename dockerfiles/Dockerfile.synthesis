@@ -5,34 +5,34 @@ WORKDIR /tmp
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -qq
+
 RUN apt-get install -y --no-install-recommends \
     ca-certificates \
     git
-RUN apt-get install -y --no-install-recommends \
-    bison \
-    build-essential \
-    cmake \
-    default-jre \
-    flex \
-    gnat \
-    libffi-dev \
-    libreadline-dev \
-    pkg-config \
-    python3-orderedmultidict \
-    tcl-dev \
-    zlib1g-dev
 
 #
-# GHDL
+# GHDL (https://github.com/ghdl/ghdl)
 #
+
+RUN apt-get install -y --no-install-recommends \
+    build-essential \
+    gnat \
+    zlib1g-dev
 
 RUN git clone --depth 1 https://github.com/ghdl/ghdl
 RUN mkdir ghdl/build && cd ghdl/build && ../configure --prefix=/usr/local \
  && make -j$(nproc) && make install
 
 #
-# Yosys
+# Yosys (https://github.com/yosyshq/yosys)
 #
+
+RUN apt-get install -y --no-install-recommends \
+    bison \
+    build-essential \
+    cmake \
+    flex \
+    python3
 
 RUN git clone --depth 1 https://github.com/YosysHQ/yosys
 RUN cd yosys && git submodule update --init --depth 1 \
@@ -49,8 +49,21 @@ RUN cd ghdl-yosys-plugin && git submodule update --init --depth 1 \
  && make -j$(nproc) && make install
 
 #
-# Synlig
+# Synlig (https://github.com/chipsalliance/synlig)
 #
+
+RUN apt-get install -y --no-install-recommends \
+    bison \
+    build-essential \
+    cmake \
+    default-jre \
+    flex \
+    libffi-dev \
+    libreadline-dev \
+    pkg-config \
+    python3 \
+    python3-orderedmultidict \
+    tcl-dev
 
 RUN git clone --depth 1 https://github.com/chipsalliance/synlig
 RUN cd synlig \

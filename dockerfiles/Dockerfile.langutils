@@ -10,14 +10,6 @@ RUN apt-get install -y --no-install-recommends \
     ca-certificates \
     git
 
-RUN apt-get install -y --no-install-recommends \
-    cargo \
-    cmake \
-    curl \
-    default-jre \
-    python3 \
-    python3-orderedmultidict
-
 #
 # vhd2vl (https://github.com/ldoolitt/vhd2vl)
 #
@@ -104,10 +96,11 @@ RUN apt-get install -y --no-install-recommends \
 RUN cargo install --root /usr/local --git https://github.com/dalance/svlint.git svlint
 
 #
-# clean-up
+# Optimization
 #
 
-RUN rm -f /usr/local/bin/stack /usr/local/bin/bazel
+RUN strip /usr/local/bin/* 2>/dev/null || true
+RUN find /usr/local/lib -name "*.so*" -exec strip --strip-unneeded {} + 2>/dev/null || true
 
 #------------------------------------------------------------------------------
 
