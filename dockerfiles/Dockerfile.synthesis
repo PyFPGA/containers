@@ -73,6 +73,14 @@ RUN cd synlig \
  && sed -i '1s/^/#include <cstdint>\n/' third_party/yosys/libs/json11/json11.cpp \
  && make install -j$(nproc)
 
+#
+# Optimization and clean-up
+#
+
+RUN strip /usr/local/bin/* 2>/dev/null || true
+RUN find /usr/local/lib -name "*.a" -delete \
+ && rm -rf /usr/local/lib/cmake /usr/local/*/pkgconfig
+
 #------------------------------------------------------------------------------
 
 FROM ubuntu:latest AS runtime
@@ -84,6 +92,8 @@ RUN apt-get update -qq && apt-get install -y --no-install-recommends \
     libreadline-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /usr/local /usr/local
+COPY --from=builder /usr/local/bin   /usr/local/bin
+COPY --from=builder /usr/local/lib   /usr/local/lib
+COPY --from=builder /usr/local/share /usr/local/share
 
 RUN ldconfig

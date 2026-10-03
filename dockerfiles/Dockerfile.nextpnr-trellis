@@ -38,15 +38,19 @@ RUN cd nextpnr && git submodule update --init --recursive \
  && make -j$(nproc) && make install
 
 #
-# Optimization
+# Optimization and clean-up
 #
 
 RUN strip /usr/local/bin/* 2>/dev/null || true
+RUN find /usr/local/lib -name "*.a" -delete \
+ && rm -rf /usr/local/lib/cmake /usr/local/*/pkgconfig
 
 #------------------------------------------------------------------------------
 
 FROM ubuntu:latest AS runtime
 
-COPY --from=builder /usr/local /usr/local
+COPY --from=builder /usr/local/bin   /usr/local/bin
+COPY --from=builder /usr/local/lib   /usr/local/lib
+COPY --from=builder /usr/local/share /usr/local/share
 
 RUN ldconfig
