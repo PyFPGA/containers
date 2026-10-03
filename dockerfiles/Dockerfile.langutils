@@ -96,16 +96,20 @@ RUN apt-get install -y --no-install-recommends \
 RUN cargo install --root /usr/local --git https://github.com/dalance/svlint.git svlint
 
 #
-# Optimization
+# Optimization and clean-up
 #
 
 RUN strip /usr/local/bin/* 2>/dev/null || true
-RUN find /usr/local/lib -name "*.so*" -exec strip --strip-unneeded {} + 2>/dev/null || true
+RUN find /usr/local/lib -name "*.a" -delete \
+ && find /usr/local/lib -name "*.so" -delete \
+ && rm -rf /usr/local/lib/cmake /usr/local/*/pkgconfig
 
 #------------------------------------------------------------------------------
 
 FROM ubuntu:latest AS runtime
 
-COPY --from=builder /usr/local /usr/local
+COPY --from=builder /usr/local/bin   /usr/local/bin
+COPY --from=builder /usr/local/lib   /usr/local/lib
+COPY --from=builder /usr/local/share /usr/local/share
 
 RUN ldconfig

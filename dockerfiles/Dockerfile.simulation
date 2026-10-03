@@ -68,11 +68,12 @@ RUN apt-get install -y --no-install-recommends \
 RUN python3 -m venv /opt/venv && /opt/venv/bin/pip install --no-cache-dir cocotb
 
 #
-# Optimization
+# Optimization and clean-up
 #
 
 RUN strip /usr/local/bin/* 2>/dev/null || true
-RUN find /usr/local/lib -name "*.so*" -exec strip --strip-unneeded {} + 2>/dev/null || true
+RUN find /usr/local/lib -name "*.a" -delete \
+ && rm -rf /usr/local/lib/cmake /usr/local/*/pkgconfig
 
 #------------------------------------------------------------------------------
 
@@ -89,7 +90,9 @@ RUN apt-get update -qq && apt-get install -y --no-install-recommends \
     zlib1g \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /usr/local /usr/local
+COPY --from=builder /usr/local/bin   /usr/local/bin
+COPY --from=builder /usr/local/lib   /usr/local/lib
+COPY --from=builder /usr/local/share /usr/local/share
 COPY --from=builder /opt/venv /opt/venv
 
 RUN ldconfig
