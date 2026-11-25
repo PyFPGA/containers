@@ -1,0 +1,7 @@
+# Lattice iCEstick (iCE40-HX1K-TQ144): clock, four LEDs; rst on the FTDI RX pin (no button)
+set_io clk 21
+set_io rst 9
+set_io count[0] 99
+set_io count[1] 98
+set_io count[2] 97
+set_io count[3] 96

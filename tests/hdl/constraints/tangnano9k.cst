@@ -1,0 +1,7 @@
+// Sipeed Tang Nano 9K (GW1NR-LV9QN88PC6/I5): clock, reset (sys_rst_n in Sipeed examples), LEDs
+IO_LOC "clk" 52;
+IO_LOC "rst" 4;
+IO_LOC "count[0]" 10;
+IO_LOC "count[1]" 11;
+IO_LOC "count[2]" 13;
+IO_LOC "count[3]" 14;
