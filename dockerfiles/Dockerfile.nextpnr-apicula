@@ -14,7 +14,11 @@ RUN apt-get install -y --no-install-recommends \
 RUN apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
-    libboost-all-dev \
+    libboost-dev \
+    libboost-filesystem-dev \
+    libboost-iostreams-dev \
+    libboost-program-options-dev \
+    libboost-thread-dev \
     libeigen3-dev \
     python3-dev
 
@@ -50,9 +54,16 @@ RUN find /usr/local/lib -name "*.a" -delete \
 
 FROM ubuntu:latest AS runtime
 
-RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+RUN apt-get update -qq \
+    && BOOST=$(apt-cache depends libboost-dev | sed -n 's/.*Depends: libboost\([0-9.]*\)-dev$/\1/p') \
+    && PYTHON=$(apt-cache depends python3 | sed -n 's/.*Depends: python\(3\.[0-9]*\)$/\1/p') \
+    && apt-get install -y --no-install-recommends \
+    "libboost-iostreams$BOOST.0" \
+    "libboost-program-options$BOOST.0" \
+    "libboost-thread$BOOST.0" \
     python3 \
- && rm -rf /var/lib/apt/lists/*
+    "libpython$PYTHON" \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local/bin   /usr/local/bin
 COPY --from=builder /usr/local/lib   /usr/local/lib

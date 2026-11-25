@@ -1,35 +1,32 @@
 #!/bin/bash
 
-set -e
+FAILED=()
 
-DOCKER="docker run --rm -v $HOME:$HOME -w $PWD --user $(id -u):$(id -g) ghcr.io/pyfpga/langutils"
-echo "* vhd2vl"
-$DOCKER ldd /usr/local/bin/vhd2vl
-echo "* sv2v"
-$DOCKER ldd /usr/local/bin/sv2v
-echo "* slang"
-$DOCKER ldd /usr/local/bin/slang
-echo "* surelog"
-$DOCKER ldd /usr/local/bin/surelog
-echo "* verible"
-$DOCKER ldd /usr/local/bin/verible-verilog-syntax
-echo "* svlint"
-$DOCKER ldd /usr/local/bin/svlint
+check() {
+  local image=$1; shift
+  local DOCKER="docker run --rm --user $(id -u):$(id -g) ghcr.io/pyfpga/${image}"
+  for bin in "$@"; do
+    echo "* ${image}: ${bin}"
+    if ! out=$($DOCKER ldd "/usr/local/bin/${bin}" 2>&1); then
+      echo "$out"
+      FAILED+=("${image}: ${bin} (ldd failed)")
+    elif grep "not found" <<< "$out"; then
+      FAILED+=("${image}: ${bin} (missing libraries)")
+    fi
+  done
+}
 
-DOCKER="docker run --rm -v $HOME:$HOME -w $PWD --user $(id -u):$(id -g) ghcr.io/pyfpga/synthesis"
-echo "* ghdl"
-$DOCKER ldd /usr/local/bin/ghdl
-echo "* yosys"
-$DOCKER ldd /usr/local/bin/yosys
-echo "* synlig"
-$DOCKER ldd /usr/local/bin/synlig
+check langutils vhd2vl sv2v slang surelog verible-verilog-syntax svlint
+check synthesis ghdl yosys synlig
+check simulation ghdl iverilog verilator_bin
+check nextpnr-icestorm nextpnr-ice40 icepack
+check nextpnr-trellis nextpnr-ecp5 ecppack
+check nextpnr-apicula nextpnr-himbaechel
 
-DOCKER="docker run --rm -v $HOME:$HOME -w $PWD --user $(id -u):$(id -g) ghcr.io/pyfpga/simulation"
-echo "* ghdl"
-$DOCKER ldd /usr/local/bin/ghdl
-echo "* iverilog"
-$DOCKER ldd /usr/local/bin/iverilog
-echo "* verilator"
-$DOCKER ldd /usr/local/bin/verilator_bin
+if [ ${#FAILED[@]} -gt 0 ]; then
+  echo "Test failed:"
+  printf '  %s\n' "${FAILED[@]}"
+  exit 1
+fi
 
 echo "Test passed"

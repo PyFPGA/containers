@@ -65,7 +65,11 @@ RUN apt-get install -y --no-install-recommends \
     python3-pip \
     python3-venv
 
-RUN python3 -m venv /opt/venv && /opt/venv/bin/pip install --no-cache-dir cocotb
+RUN python3 -m venv /opt/venv && /opt/venv/bin/pip install --no-cache-dir \
+    cocotb \
+    cocotbext-axi \
+    pytest \
+    wavedrom
 
 #
 # Optimization and clean-up
@@ -82,12 +86,15 @@ FROM ubuntu:latest AS runtime
 ENV PATH="/opt/venv/bin:$PATH"
 
 RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+    ca-certificates \
     g++ \
     make \
     perl \
     python3 \
     libgnat-14 \
     zlib1g \
+    && apt-get install -y --no-install-recommends \
+    "libpython$(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')" \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local/bin   /usr/local/bin
