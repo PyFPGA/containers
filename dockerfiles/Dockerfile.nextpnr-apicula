@@ -37,7 +37,7 @@ RUN pip3 install --no-cache-dir --break-system-packages \
 #
 
 RUN git clone --depth 1 https://github.com/YosysHQ/nextpnr
-RUN cd nextpnr && git submodule update --init --recursive \
+RUN cd nextpnr && git submodule update --init --depth 1 --recursive \
  && mkdir -p build && cd build \
  && cmake .. -DARCH="himbaechel" -DHIMBAECHEL_UARCH="gowin" -DTRELLIS_INSTALL_PREFIX=/usr/local \
  && make -j$(nproc) && make install

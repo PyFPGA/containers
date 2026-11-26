@@ -46,7 +46,7 @@ RUN apt-get install -y --no-install-recommends \
     python3
 
 RUN git clone --depth 1 https://github.com/MikePopoloski/slang.git
-RUN cd slang && cmake -B build && cmake --build build -j$(nproc) \
+RUN cd slang && cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j$(nproc) \
  && cmake --install build --strip
 
 #
@@ -103,6 +103,8 @@ RUN find /usr/local/bin /usr/local/lib -type f -not -path "*/python3*" \
     -exec strip --strip-unneeded {} + 2>/dev/null || true
 RUN find /usr/local/lib -name "*.a" -delete \
  && find /usr/local/lib -name "*.so" -delete \
+ && rm -f /usr/local/bin/roundtrip /usr/local/bin/mdgen /usr/local/bin/uhdm-* \
+    /usr/local/bin/verible-verilog-kythe-* /usr/local/bin/slang-reflect \
  && rm -rf /usr/local/lib/cmake /usr/local/*/pkgconfig
 
 #------------------------------------------------------------------------------

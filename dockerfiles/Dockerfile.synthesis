@@ -86,9 +86,11 @@ RUN find /usr/local/lib -name "*.a" -delete \
 
 FROM ubuntu:latest AS runtime
 
-RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+RUN apt-get update -qq \
+    && GNAT=$(apt-cache depends gnat | sed -n 's/.*Depends: gnat-\([0-9]*\)$/\1/p') \
+    && apt-get install -y --no-install-recommends \
     libffi8 \
-    libgnat-14 \
+    "libgnat-$GNAT" \
     libreadline8t64 \
     libtcl8.6 \
     && rm -rf /var/lib/apt/lists/*

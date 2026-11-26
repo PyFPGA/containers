@@ -87,13 +87,15 @@ FROM ubuntu:latest AS runtime
 
 ENV PATH="/opt/venv/bin:$PATH"
 
-RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+RUN apt-get update -qq \
+    && GNAT=$(apt-cache depends gnat | sed -n 's/.*Depends: gnat-\([0-9]*\)$/\1/p') \
+    && apt-get install -y --no-install-recommends \
     ca-certificates \
     g++ \
     make \
     perl \
     python3 \
-    libgnat-14 \
+    "libgnat-$GNAT" \
     zlib1g \
     && apt-get install -y --no-install-recommends \
     "libpython$(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')" \
