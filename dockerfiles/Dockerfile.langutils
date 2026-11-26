@@ -99,7 +99,8 @@ RUN cargo install --root /usr/local --git https://github.com/dalance/svlint.git 
 # Optimization and clean-up
 #
 
-RUN strip /usr/local/bin/* 2>/dev/null || true
+RUN find /usr/local/bin /usr/local/lib -type f -not -path "*/python3*" \
+    -exec strip --strip-unneeded {} + 2>/dev/null || true
 RUN find /usr/local/lib -name "*.a" -delete \
  && find /usr/local/lib -name "*.so" -delete \
  && rm -rf /usr/local/lib/cmake /usr/local/*/pkgconfig

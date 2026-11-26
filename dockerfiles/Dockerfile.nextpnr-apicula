@@ -46,7 +46,8 @@ RUN cd nextpnr && git submodule update --init --recursive \
 # Optimization and clean-up
 #
 
-RUN strip /usr/local/bin/* 2>/dev/null || true
+RUN find /usr/local/bin /usr/local/lib -type f -not -path "*/python3*" \
+    -exec strip --strip-unneeded {} + 2>/dev/null || true
 RUN find /usr/local/lib -name "*.a" -delete \
  && rm -rf /usr/local/lib/cmake /usr/local/*/pkgconfig
 

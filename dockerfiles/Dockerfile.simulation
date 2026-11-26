@@ -75,8 +75,10 @@ RUN python3 -m venv /opt/venv && /opt/venv/bin/pip install --no-cache-dir \
 # Optimization and clean-up
 #
 
-RUN strip /usr/local/bin/* 2>/dev/null || true
+RUN find /usr/local/bin /usr/local/lib -type f -not -path "*/python3*" \
+    -exec strip --strip-unneeded {} + 2>/dev/null || true
 RUN find /usr/local/lib -name "*.a" -delete \
+ && rm -f /usr/local/bin/verilator_bin_dbg /usr/local/bin/verilator_coverage_bin_dbg \
  && rm -rf /usr/local/lib/cmake /usr/local/*/pkgconfig
 
 #------------------------------------------------------------------------------
