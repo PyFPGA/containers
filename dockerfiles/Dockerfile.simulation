@@ -75,8 +75,10 @@ RUN python3 -m venv /opt/venv && /opt/venv/bin/pip install --no-cache-dir \
 # Optimization and clean-up
 #
 
-RUN strip /usr/local/bin/* 2>/dev/null || true
+RUN find /usr/local/bin /usr/local/lib -type f -not -path "*/python3*" \
+    -exec strip --strip-unneeded {} + 2>/dev/null || true
 RUN find /usr/local/lib -name "*.a" -delete \
+ && rm -f /usr/local/bin/verilator_bin_dbg /usr/local/bin/verilator_coverage_bin_dbg \
  && rm -rf /usr/local/lib/cmake /usr/local/*/pkgconfig
 
 #------------------------------------------------------------------------------
@@ -85,13 +87,15 @@ FROM ubuntu:latest AS runtime
 
 ENV PATH="/opt/venv/bin:$PATH"
 
-RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+RUN apt-get update -qq \
+    && GNAT=$(apt-cache depends gnat | sed -n 's/.*Depends: gnat-\([0-9]*\)$/\1/p') \
+    && apt-get install -y --no-install-recommends \
     ca-certificates \
     g++ \
     make \
     perl \
     python3 \
-    libgnat-14 \
+    "libgnat-$GNAT" \
     zlib1g \
     && apt-get install -y --no-install-recommends \
     "libpython$(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')" \

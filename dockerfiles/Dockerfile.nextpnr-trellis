@@ -28,7 +28,7 @@ RUN apt-get install -y --no-install-recommends \
 #
 
 RUN git clone --depth 1 --recursive https://github.com/YosysHQ/prjtrellis
-RUN cd prjtrellis/libtrellis && cmake -DCMAKE_INSTALL_PREFIX=/usr/local . \
+RUN cd prjtrellis/libtrellis && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local . \
  && make -j$(nproc) && make install
 
 #
@@ -36,7 +36,7 @@ RUN cd prjtrellis/libtrellis && cmake -DCMAKE_INSTALL_PREFIX=/usr/local . \
 #
 
 RUN git clone --depth 1 https://github.com/YosysHQ/nextpnr
-RUN cd nextpnr && git submodule update --init --recursive \
+RUN cd nextpnr && git submodule update --init --depth 1 --recursive \
  && mkdir -p build && cd build \
  && cmake .. -DARCH=ecp5 -DTRELLIS_INSTALL_PREFIX=/usr/local \
  && make -j$(nproc) && make install
@@ -45,8 +45,10 @@ RUN cd nextpnr && git submodule update --init --recursive \
 # Optimization and clean-up
 #
 
-RUN strip /usr/local/bin/* 2>/dev/null || true
+RUN find /usr/local/bin /usr/local/lib -type f -not -path "*/python3*" \
+    -exec strip --strip-unneeded {} + 2>/dev/null || true
 RUN find /usr/local/lib -name "*.a" -delete \
+ && rm -rf /usr/local/share/trellis/database/MachXO* \
  && rm -rf /usr/local/lib/cmake /usr/local/*/pkgconfig
 
 #------------------------------------------------------------------------------

@@ -77,7 +77,8 @@ RUN cd synlig \
 # Optimization and clean-up
 #
 
-RUN strip /usr/local/bin/* 2>/dev/null || true
+RUN find /usr/local/bin /usr/local/lib /usr/local/share/yosys/plugins -type f -not -path "*/python3*" \
+    -exec strip --strip-unneeded {} + 2>/dev/null || true
 RUN find /usr/local/lib -name "*.a" -delete \
  && rm -rf /usr/local/lib/cmake /usr/local/*/pkgconfig
 
@@ -85,11 +86,13 @@ RUN find /usr/local/lib -name "*.a" -delete \
 
 FROM ubuntu:latest AS runtime
 
-RUN apt-get update -qq && apt-get install -y --no-install-recommends \
-    libffi-dev \
-    tcl-dev \
-    libgnat-14 \
-    libreadline-dev \
+RUN apt-get update -qq \
+    && GNAT=$(apt-cache depends gnat | sed -n 's/.*Depends: gnat-\([0-9]*\)$/\1/p') \
+    && apt-get install -y --no-install-recommends \
+    libffi8 \
+    "libgnat-$GNAT" \
+    libreadline8t64 \
+    libtcl8.6 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local/bin   /usr/local/bin
